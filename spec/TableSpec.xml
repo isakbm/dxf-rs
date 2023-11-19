@@ -114,6 +114,9 @@
             <Pointer Name="plot_style" Code="390" MinVersion="R2000" />
             <Pointer Name="material" Code="347" MinVersion="R2007" />
 
+            <!-- this was missing from upstream :P -->
+            <Field Name="standard_flags" Code="70" Type="i32" DefaultValue="0" ReadConverter="i32::from({})" WriteConverter="{} as i16" />
+
             <!-- this field doesn't get read from or written to the file; it's a by-product of the color -->
             <Field Name="is_layer_on" Code="-1" Type="bool" DefaultValue="true" GenerateReader="false" GenerateWriter="false" />
         </TableItem>

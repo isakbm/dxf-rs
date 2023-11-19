@@ -1,11 +1,11 @@
 [package]
 name = "dxf"
-version = "0.5.0"
-authors = ["Brett V. Forsgren <brett.forsgren@outlook.com>"]
+version = "1.0.0"
+authors = ["Isak Buhl-Mortensen"]
 build = "build/build.rs"
 description = "A rust crate for reading and writing DXF and DXB CAD files."
 documentation = "https://docs.rs/dxf/"
-repository = "https://github.com/ixmilia/dxf-rs"
+repository = "https://github.com/isakbm/dxf-rs"
 readme = "README.md"
 keywords = ["AutoCAD", "CAD", "DXB", "DXF"]
 license = "MIT"
