@@ -834,7 +834,9 @@ impl Drawing {
     }
     fn ensure_block_entity_handles_are_set(&mut self, block: &mut Block) {
         for ent in &mut block.entities {
-            ent.common.handle = self.next_handle();
+            if ent.common.handle.is_empty() {
+                ent.common.handle = self.next_handle();
+            }
         }
     }
     fn ensure_line_type_is_present_for_object(&mut self, obj: &Object) {
