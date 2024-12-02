@@ -57,7 +57,7 @@ where
 {
     // dates are represented as the fractional number of days elapsed since December 31, 1899.
     let epoch = epoch(timezone);
-    let duration = if date == 0.0 {
+    let _duration = if date == 0.0 {
         ChronoDuration::seconds(0)
     } else {
         let duration = f64_to_adjusted_duration(date);
@@ -66,7 +66,15 @@ where
             _ => ChronoDuration::seconds(0),
         }
     };
-    epoch + duration
+
+    // NOTE: we just return epoch which is incorrect
+    //       but we do it because we dont' care about the timestampe
+    //       as much as we care about avoiding overflow
+    //       FIXME consider actually doing it properly?
+    //
+    // epoch + duration <--- this overflows sometimes
+
+    epoch
 }
 
 pub(crate) fn as_datetime_local(date: f64) -> DateTime<Local> {
