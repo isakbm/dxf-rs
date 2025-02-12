@@ -1160,10 +1160,16 @@ impl Entity {
         mtext: &mut MText,
         iter: &mut CodePairPutBack,
     ) -> DxfResult<bool> {
+        // MText is often followed by embedded object, some codepairs there overlap with
+        // MText codepairs and makes MText corrupted. If we see embedded object we ignore its data.
+        let mut ignore_embedded_object = false;
         let mut reading_column_data = false;
         let mut read_column_count = false;
         loop {
             let pair = next_pair!(iter);
+            if ignore_embedded_object {
+                continue;
+            }
             match pair.code {
                 10 => {
                     mtext.insertion_point.x = pair.assert_f64()?;
@@ -1285,6 +1291,9 @@ impl Entity {
                 }
                 49 => {
                     mtext.column_gutter = pair.assert_f64()?;
+                }
+                101 => {
+                    ignore_embedded_object = true;
                 }
                 _ => {
                     common.apply_individual_pair(&pair, iter)?;
