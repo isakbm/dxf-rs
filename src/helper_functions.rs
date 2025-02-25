@@ -1,4 +1,4 @@
-use std::cmp::Ordering;
+use std::fmt::Debug;
 use std::io;
 use std::io::Read;
 use std::time::Duration as StdDuration;
@@ -34,13 +34,19 @@ pub(crate) fn as_bool(v: i16) -> bool {
     v == 1
 }
 
+#[allow(dead_code)]
 fn f64_to_adjusted_duration(f: f64) -> ChronoDuration {
     let days_since_dublin = f - 2_415_020.0; // julian dublin offset, e.g., December 31, 1899 12:00AM
     let secs_per_day = 24i64 * 60 * 60;
     let seconds = days_since_dublin * secs_per_day as f64;
     // functions consuming this need to use 1900/01/01 instead of 1899/12/31 as a base
     // so we counter the extra day and leap second here
-    ChronoDuration::seconds(seconds as i64 - secs_per_day + 1)
+    ChronoDuration::seconds(
+        // clamping here because of ChronoDuration::seconds documentation on its panics:
+        //
+        // Panics when `seconds` is more than `i64::MAX / 1_000` or less than `-i64::MAX / 1_000`..
+        (seconds as i64 - secs_per_day + 1).clamp(-i64::MAX / 1_000, i64::MAX / 1_000),
+    )
 }
 
 fn epoch<T>(timezone: &T) -> DateTime<T>
@@ -51,21 +57,23 @@ where
     timezone.with_ymd_and_hms(1900, 1, 1, 0, 0, 0).unwrap()
 }
 
-fn as_datetime<T>(timezone: &T, date: f64) -> DateTime<T>
+fn as_datetime<T>(timezone: &T, _date: f64) -> DateTime<T>
 where
-    T: TimeZone,
+    T: TimeZone + Debug,
 {
     // dates are represented as the fractional number of days elapsed since December 31, 1899.
-    let epoch = epoch(timezone);
-    let _duration = if date == 0.0 {
-        ChronoDuration::seconds(0)
-    } else {
-        let duration = f64_to_adjusted_duration(date);
-        match ChronoDuration::seconds(0).cmp(&duration) {
-            Ordering::Less => duration,
-            _ => ChronoDuration::seconds(0),
-        }
-    };
+
+    // unused since circa 2024-12, commented out because it could still lead to crashes
+    // let epoch = epoch(timezone);
+    // let _duration = if date == 0.0 {
+    //     ChronoDuration::seconds(0)
+    // } else {
+    //     let duration = f64_to_adjusted_duration(date);
+    //     match ChronoDuration::seconds(0).cmp(&duration) {
+    //         Ordering::Less => duration,
+    //         _ => ChronoDuration::seconds(0),
+    //     }
+    // };
 
     // NOTE: we just return epoch which is incorrect
     //       but we do it because we dont' care about the timestampe
@@ -74,7 +82,7 @@ where
     //
     // epoch + duration <--- this overflows sometimes
 
-    epoch
+    epoch(timezone)
 }
 
 pub(crate) fn as_datetime_local(date: f64) -> DateTime<Local> {
