@@ -1211,7 +1211,7 @@ impl Object {
                     sf.clip_boundary_origin.z = pair.assert_f64()?;
                 }
                 40 => {
-                    if !read_front_clipping_plane {
+                    if sf.is_front_clipping_plane && !read_front_clipping_plane {
                         sf.front_clipping_plane_distance = pair.assert_f64()?;
                         read_front_clipping_plane = true;
                     } else {
@@ -1221,19 +1221,19 @@ impl Object {
                                 matrix_list[0],
                                 matrix_list[1],
                                 matrix_list[2],
-                                0.0,
                                 matrix_list[3],
                                 matrix_list[4],
                                 matrix_list[5],
-                                0.0,
                                 matrix_list[6],
                                 matrix_list[7],
                                 matrix_list[8],
-                                0.0,
                                 matrix_list[9],
                                 matrix_list[10],
                                 matrix_list[11],
                                 0.0,
+                                0.0,
+                                0.0,
+                                1.0,
                             ]);
                             matrix_list.clear();
                             if !set_inverse_matrix {
