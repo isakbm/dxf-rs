@@ -615,6 +615,8 @@ impl Entity {
                         _ => {
                             match EntityType::from_type_string(&type_string) {
                                 Some(e) => {
+                                    // NOTE: @Arek here might be some relevant code for parsing
+                                    // FaceRecords
                                     let mut entity = Entity::new(e);
                                     if !entity.apply_custom_reader(iter)? {
                                         // no custom reader, use the auto-generated one

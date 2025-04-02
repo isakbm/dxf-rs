@@ -136,6 +136,12 @@ where
             }) => {
                 let mut poly = poly.clone(); // 13 fields
                 loop {
+                    // NOTE: @Arek pushing polyline vertices (also erroneous FaceRecords)
+                    // Instead of just pushing vertices mindlessly we should process them based on
+                    // FaceRecords. It's face records after all which define visible edges of the
+                    // "polyline".
+                    // Look here: https://help.autodesk.com/view/OARX/2018/ENU/?guid=GUID-0741E831-599E-4CBF-91E1-8ADBCFD6556D
+                    // And here: https://help.autodesk.com/view/OARX/2021/RUS/?guid=OARX-RefGuide-AcDbFaceRecord
                     match iter.next() {
                         Some(Entity {
                             specific: EntityType::Vertex(vertex),
